@@ -45,8 +45,8 @@ main = do
   where
     opts = Opt.info (helper <*> options)
         ( Opt.fullDesc
-        <> Opt.progDesc "stuff"
-        <> Opt.header "other"
+        <> Opt.progDesc "generate N random names using FILE"
+        <> Opt.header "nomegen: a random name generator"
         )
 
 printWords :: Options -> Nomicon -> IO ()
@@ -65,23 +65,26 @@ options = Options
     <$> Opt.option (flip openFile WriteMode <$> Opt.str)
         ( Opt.short 'o'
         <> Opt.long "out"
-        <> Opt.help "file to write the output"
+        <> Opt.metavar "OUT"
+        <> Opt.help "File to write the output"
         <> Opt.value (return stdout)
         )
     <*> Opt.option Opt.auto
         ( Opt.short 'n'
         <> Opt.long "number"
-        <> Opt.help "number of words to generate (default: 1)"
+        <> Opt.metavar "N"
+        <> Opt.help "Number of words to generate (default: 1)"
         <> Opt.value (1 :: Int)
         )
     <*> Opt.switch
         ( Opt.short 'l'
         <> Opt.long "lowercase"
-        <> Opt.help "do not capitalize output"
+        <> Opt.help "Do not capitalize output"
         )
     -- TODO: this should be stdin by default.
     <*> Opt.strArgument
         ( Opt.metavar "FILE"
+        <> Opt.help "The Nomicon file to use"
         )
 
 capitalize :: Text -> Text
