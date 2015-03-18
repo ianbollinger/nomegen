@@ -16,11 +16,6 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeFamilies #-}
 
--- TODO: Move TODOs to issue tracker.
--- TODO: Document module.
--- TODO: Add description field to headers.
--- TODO: Write test suite.
-
 -- |
 -- Module: $Header$
 -- Copyright: 2015 Ian D. Bollinger
@@ -97,32 +92,21 @@ import System.Random.MWC.CondensedTable (
     CondensedTableV, genFromTable, tableFromWeights,
     )
 
--- TODO: split up module.
-
 -- Nomicon ---------------------------------------------------------------------
-
--- TODO: binary serialization of Nomicon. Unfortunately, the internals of
--- CondensedTable are hidden so this is currently impossible.
--- TODO: Use lenses.
 
 -- | A collection of 'Name' objects.
 data Nomicon = Nomicon {
     _nomiconSegments :: !(Set Segment),
     _nomiconMarkovMap :: !MarkovMap,
     _nomiconEntries :: !(Seq Name)
-    }  -- deriving (Data, Eq, Ord, Read, Show, Generic, Typeable)
+    }
 
--- instance NFData Nomicon
-
--- TODO: unicode normalization.
 instance FromJSON Nomicon where
     parseJSON = \case
         Json.Object o -> do
             _nomiconSegments <- o .: "segments"
             entries <- o .: "entries"
             let _nomiconEntries = parseNames _nomiconSegments entries
-                -- TODO: clearly bundling the map with the Nomicon here is
-                -- nonsensical; we need configuration information here.
                 _nomiconMarkovMap = buildMarkovMap 2 _nomiconEntries
             return Nomicon {..}
         _ -> mzero
@@ -150,7 +134,6 @@ prefix segments n entry
     | makeSegment (Text.dropEnd n entry) `Set.member` segments =
         Text.splitAt (Text.length entry - n) entry
     | n < Text.length entry = prefix segments (n + 1) entry
-    -- TODO: (6) don't throw exceptions!
     | otherwise = error $ "Unknown segment " <> Text.unpack entry
 
 buildMarkovMap :: Int -> Seq Name -> MarkovMap
@@ -164,8 +147,6 @@ buildCondensedTableV = tableFromWeights . Vector.fromList . Map.toAscList
 type Weights = Map Segment Double
 type WeightMap = Map (Seq Segment) Weights
 
--- TODO: clean up this mess!
--- TODO: rename.
 countSegments :: Int -> Seq Name -> WeightMap
 countSegments context = Foldable.foldl' doNames mempty
     where
@@ -178,12 +159,10 @@ countSegments context = Foldable.foldl' doNames mempty
         doSegments weightMap window =
             Map.alter f predecessor weightMap
             where
-                -- TODO: rename.
                 f :: Maybe Weights -> Maybe Weights
                 f = Just . \case
                     Just x -> Map.insertWith (+) successor 1.0 x
                     Nothing -> Map.singleton successor 1.0
-                -- TODO: eliminate spurious warning here.
                 predecessor :> successor = Seq.viewr window
 
 -- | Sliding windows over a sequence. That is, @windows n xs@ is every
@@ -191,7 +170,6 @@ countSegments context = Foldable.foldl' doNames mempty
 windows :: Int -> Seq a -> Seq (Seq a)
 windows n0 = go 0 Seq.empty
     where
-        -- TODO: simplify and/or document.
         go n s ax = case Seq.viewl ax of
             Seq.EmptyL -> Seq.empty
             a :< as
@@ -252,7 +230,6 @@ type instance Element Name = Segment
 instance AsEmpty Name
 
 instance Cons Name Name Segment Segment where
-    -- TODO: try to simplify.
     _Cons = nameIso
         . _Cons
         . iso (second makeName) (second nameSegments)
@@ -272,7 +249,6 @@ instance MonoTraversable Name where
     omapM f = liftM Name . omapM f . nameSegments
 
 instance Snoc Name Name Segment Segment where
-    -- TODO: try to simplify.
     _Snoc = nameIso
         . _Snoc
         . iso (first makeName) (first nameSegments)
@@ -286,7 +262,6 @@ makeName = Name
 nameSegments :: Name -> Seq Segment
 nameSegments (Name x) = x
 
--- TODO: rename and export.
 nameIso :: Iso' Name (Seq Segment)
 nameIso = iso nameSegments makeName
 
@@ -318,7 +293,6 @@ type instance Element Segment = Char
 instance AsEmpty Segment
 
 instance Cons Segment Segment Char Char where
-    -- TODO: try to simplify.
     _Cons = segmentIso
         . _Cons
         . iso (second makeSegment) (second segmentToText)
@@ -337,7 +311,6 @@ instance IsList Segment where
 instance FromJSON Segment where
     parseJSON = \case
         Json.String x -> return $ makeSegment x
-        -- TODO: can we provide a better error message here?
         _ -> mzero
 
 deriving instance MonoFoldable Segment
@@ -347,7 +320,6 @@ instance MonoTraversable Segment where
     omapM f = liftM Segment . omapM f . segmentToText
 
 instance Snoc Segment Segment Char Char where
-    -- TODO: try to simplify.
     _Snoc = segmentIso
         . _Snoc
         . iso (first makeSegment) (first segmentToText)
@@ -355,7 +327,6 @@ instance Snoc Segment Segment Char Char where
 instance ToJSON Segment where
     toJSON = Json.String . segmentToText
 
--- TODO: rename and export.
 segmentIso :: Iso' Segment Text
 segmentIso = iso segmentToText makeSegment
 
@@ -367,18 +338,9 @@ segmentToText (Segment x) = x
 
 -- Serialization ---------------------------------------------------------------
 
--- TODO: replace with custom line format.
-
--- TODO: rename.
--- TODO: we *don't* really want to leak the concrete implementation of
--- Yaml.ParseException. On the other hand, we don't really want to have to
--- collapse the data it contains.
 yamlDeserializer :: FilePath -> IO (Either Yaml.ParseException Nomicon)
--- TODO: pretty-print error message here?
 yamlDeserializer = Yaml.decodeFileEither
 
--- TODO: better messages.
--- TODO: pretty-print.
 explainYamlParseException :: Yaml.ParseException -> String
 explainYamlParseException = (preamble <>) . \case
     Yaml.NonScalarKey ->
@@ -393,7 +355,6 @@ explainYamlParseException = (preamble <>) . \case
         "YAML error: " <> yamlException <> "."
     Yaml.InvalidYaml (Just (Yaml.YamlParseException prob ctx mark)) ->
         "YAML parse error: " <> prob <> " " <> ctx <> " " <> show mark <> "."
-    -- TODO: aeson is an implementation detail.
     Yaml.AesonException string ->
         "Aeson exception: " <> string <> "."
     Yaml.OtherParseException someException ->
@@ -411,7 +372,6 @@ data MarkovMap = MarkovMap !Int !(Map (Seq Segment) (CondensedTableV Segment))
 
 generate :: Int -> Nomicon -> IO Name
 generate iterations nomicon =
-    -- TODO: consider better default behavior or allowing customization.
     withSystemRandom . asGenST $
         markovGenerate iterations (_nomiconMarkovMap nomicon)
 
@@ -419,10 +379,8 @@ markovGenerate :: Int -> MarkovMap -> GenST s -> ST s Name
 markovGenerate iterations (MarkovMap context markovMap) gen =
     selectKey >>= go iterations
     where
-        -- TODO: avoid partial function '!!'.
         selectKey = (keys !!) <$> uniformR (0, length keys - 1) gen
         keys = Map.keys markovMap
-        -- TODO: rename, simplify where possible; document where not.
         go iterations' name
             | iterations' <= 0 = return $ Name name
             | otherwise =
