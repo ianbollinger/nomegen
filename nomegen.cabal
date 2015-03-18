@@ -1,0 +1,81 @@
+name: nomegen
+version: 0.0.1
+author: Ian D. Bollinger
+maintainer: ian.bollinger@gmail.com
+copyright: 2015 Ian D. Bollinger
+license: MIT
+license-files:
+    LICENSE-MIT
+    LICENSE-APACHE
+homepage: https://github.com/ianbollinger/nomegen
+bug-reports: https://github.com/ianbollinger/nomegen/issues
+cabal-version: >= 1.10
+build-type: Simple
+stability: experimental
+category: TBD
+synopsis: TBD
+tested-with: GHC == 7.8.3
+description:
+    TBD
+
+source-repository head
+    type: git
+    location: git://github.com/ianbollinger/nomegen.git
+
+source-repository this
+    type: git
+    location: git://github.com/ianbollinger/nomegen.git
+    tag: HEAD
+
+-- TODO: data-default-class, others?
+
+library
+    default-language: Haskell2010
+    hs-source-dirs: src
+    build-depends:
+        base == 4.7.*,
+        aeson == 0.8.*,
+        containers == 0.5.*,
+        data-default == 0.5.*,
+        deepseq == 1.3.*,
+        hashable == 1.2.*,
+        lens == 4.8.*,
+        mono-traversable == 0.9.*,
+        mwc-random == 0.13.*,
+        semigroups == 0.16.*,
+        text == 1.2.*,
+        vector == 0.10.*,
+        yaml == 0.8.*
+    exposed-modules:
+        Nomegen
+    ghc-options:
+        -Wall
+        -fwarn-incomplete-record-updates
+        -fwarn-incomplete-uni-patterns
+        -fwarn-missing-import-lists
+        -fwarn-missing-local-sigs
+        -fwarn-monomorphism-restriction
+        -fwarn-tabs
+        -fwarn-unrecognised-pragmas
+
+executable nomegen
+    default-language: Haskell2010
+    hs-source-dirs: cli
+    main-is: Main.hs
+    build-depends:
+        base == 4.7.*,
+        optparse-applicative == 0.11.*,
+        text == 1.2.*,
+        nomegen
+    other-modules:
+        Nomegen.CLI
+    ghc-options:
+        -Wall
+        -fwarn-incomplete-record-updates
+        -fwarn-incomplete-uni-patterns
+        -fwarn-missing-import-lists
+        -fwarn-missing-local-sigs
+        -fwarn-monomorphism-restriction
+        -fwarn-tabs
+        -fwarn-unrecognised-pragmas
+
