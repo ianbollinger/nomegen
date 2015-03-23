@@ -18,6 +18,7 @@
 
 -- |
 -- Module: $Header$
+-- Description: Random name generation
 -- Copyright: 2015 Ian D. Bollinger
 -- License: MIT or Apache 2.0
 -- Maintainer: Ian D. Bollinger <ian.bollinger@gmail.com>
