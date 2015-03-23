@@ -74,6 +74,7 @@ import Control.Lens.Empty (AsEmpty)
 import Control.Lens.Iso (Iso', iso)
 import Data.Aeson (FromJSON, ToJSON, (.=), (.:), parseJSON, toJSON)
 import qualified Data.Aeson as Json
+import Data.Bytes.Serial (Serial)
 import Data.Default (Default, def)
 import Data.Hashable (Hashable)
 import Data.Map.Strict (Map)
@@ -252,6 +253,8 @@ instance MonoTraversable Name where
     otraverse f = fmap Name . otraverse f . nameSegments
     omapM f = liftM Name . omapM f . nameSegments
 
+instance Serial Name
+
 instance Snoc Name Name Segment Segment where
     _Snoc = nameIso
         . _Snoc
@@ -322,6 +325,8 @@ deriving instance MonoFoldable Segment
 instance MonoTraversable Segment where
     otraverse f = fmap Segment . otraverse f . segmentToText
     omapM f = liftM Segment . omapM f . segmentToText
+
+instance Serial Segment
 
 instance Snoc Segment Segment Char Char where
     _Snoc = segmentIso
