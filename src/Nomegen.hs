@@ -64,7 +64,10 @@ import GHC.Generics (Generic)
 import GHC.Exts (IsList, Item, fromList, toList)
 
 import Control.DeepSeq (NFData)
-import Control.Lens.Cons (Cons, Snoc, _Cons, _Snoc)
+import Control.Lens ((^.))
+import Control.Lens.Cons (
+    Cons, Snoc, _Cons, _Snoc, (<|), (|>), _tail, uncons, unsnoc,
+    )
 import Control.Lens.Each (Each, each)
 import Control.Lens.Empty (AsEmpty)
 import Control.Lens.Iso (Iso', iso)
@@ -78,7 +81,7 @@ import Data.MonoTraversable (
     Element, MonoFoldable, MonoFunctor, MonoPointed, MonoTraversable, otraverse,
     omapM,
     )
-import Data.Sequence (Seq, ViewL ((:<)), ViewR ((:>)), (<|), (|>))
+import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Semigroup (Semigroup)
 import Data.Text (Text)
@@ -163,23 +166,23 @@ countSegments context = Foldable.foldl' doNames mempty
                 f = Just . \case
                     Just x -> Map.insertWith (+) successor 1.0 x
                     Nothing -> Map.singleton successor 1.0
-                predecessor :> successor = Seq.viewr window
+                Just (predecessor, successor) = unsnoc window
 
 -- | Sliding windows over a sequence. That is, @windows n xs@ is every
 -- length-/n/ subsequence of /xs/ in order.
 windows :: Int -> Seq a -> Seq (Seq a)
-windows n0 = go 0 Seq.empty
+windows n0 = go 0 mempty
     where
-        go n s ax = case Seq.viewl ax of
-            Seq.EmptyL -> Seq.empty
-            a :< as
+        go n s ax = case uncons ax of
+            Nothing -> mempty
+            Just (a, as)
                 | n' < n0 -> go n' s' as
                 | n' == n0 -> s' <| go n' s' as
                 | otherwise -> s'' <| go n s'' as
                 where
                     n' = n + 1
                     s' = s |> a
-                    s'' = Seq.drop 1 s'
+                    s'' = s' ^. _tail
 
 -- | A set of every 'Segment' contained in each 'Name' in the given 'Nomicon'.
 nomiconSegments :: Nomicon -> Set Segment
