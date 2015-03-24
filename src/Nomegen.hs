@@ -386,10 +386,8 @@ generate iterations nomicon =
 
 markovGenerate :: Int -> MarkovMap -> GenST s -> ST s Name
 markovGenerate iterations (MarkovMap context markovMap) gen =
-    selectKey >>= go iterations
+    chooseKey markovMap gen >>= go iterations
     where
-        selectKey = (keys !!) <$> uniformR (0, length keys - 1) gen
-        keys = Map.keys markovMap
         go iterations' name
             | iterations' <= 0 = return $ Name name
             | otherwise =
@@ -400,4 +398,11 @@ markovGenerate iterations (MarkovMap context markovMap) gen =
                     Nothing -> return $ Name name
             where
                 predecessor = Seq.drop (Seq.length name - context) name
+
+-- | Randomly choose a key from the given 'Map'.
+chooseKey :: Map k v -> GenST s -> ST s k
+chooseKey map' gen =
+    (keys !!) <$> uniformR (0, length keys - 1) gen
+    where
+        keys = Map.keys map'
 
