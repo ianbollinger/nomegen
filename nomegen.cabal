@@ -44,7 +44,7 @@ library
         semigroups == 0.16.*,
         text == 1.2.*,
         vector == 0.10.*,
-        yaml == 0.8.*
+        yaml >= 0.8.10 && < 0.9
     exposed-modules:
         Nomegen
     ghc-options:
