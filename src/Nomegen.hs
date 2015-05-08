@@ -52,13 +52,12 @@ module Nomegen (
     generate,
     ) where
 
-import Control.Applicative ((<$>))
 import Control.Arrow (first, second)
 import Control.Monad (liftM, mzero)
-import Control.Monad.ST.Safe (ST)
+import Control.Monad.ST (ST)
 import Data.Data (Data, Typeable)
 import qualified Data.Foldable as Foldable
-import Data.Monoid (Monoid, (<>), mempty)
+import Data.Monoid ((<>))
 import Data.Ord (comparing)
 import Data.String (IsString)
 import GHC.Generics (Generic)
