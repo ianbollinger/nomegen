@@ -57,8 +57,6 @@ import Control.Lens.Empty (AsEmpty)
 import Control.Lens.Iso (Iso', iso)
 import Data.Aeson (FromJSON, ToJSON, (.=), (.:), parseJSON, toJSON)
 import qualified Data.Aeson as Json
-import Data.Bytes.Serial (Serial)
-import Data.Default (Default, def)
 import Data.Hashable (Hashable)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
@@ -166,7 +164,6 @@ instance ToJSON Nomicon where
 newtype Name = Name { _nameSegments :: Seq Segment }
     deriving (
         Data,
-        Default,
         Eq,
         Ord,
         Read,
@@ -192,8 +189,6 @@ instance IsList Name where
     type Item Name = Segment
     fromList = Name . Seq.fromList
     toList = Foldable.toList . _nameSegments
-
-instance Serial Name
 
 instance Snoc Name Name Segment Segment where
     _Snoc = nameIso
@@ -234,9 +229,6 @@ instance Cons Segment Segment Char Char where
         . _Cons
         . iso (second Segment) (second _segmentText)
 
-instance Default Segment where
-    def = mempty
-
 instance Each Segment Segment Char Char where
     each = segmentIso . each
 
@@ -249,8 +241,6 @@ instance FromJSON Segment where
     parseJSON = \case
         Json.String x -> return $ Segment x
         _ -> mzero
-
-instance Serial Segment
 
 instance Snoc Segment Segment Char Char where
     _Snoc = segmentIso
