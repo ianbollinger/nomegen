@@ -47,6 +47,7 @@ library
         yaml >= 0.8.10 && < 0.9
     exposed-modules:
         Nomegen
+        Nomegen.Internal
     ghc-options:
         -Wall
         -fwarn-incomplete-record-updates
