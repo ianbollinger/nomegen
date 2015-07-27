@@ -13,7 +13,6 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeFamilies #-}
 
 -- |
@@ -40,7 +39,7 @@ module Nomegen.Internal (
     ) where
 
 import Control.Arrow (first, second)
-import Control.Monad (liftM, mzero)
+import Control.Monad (mzero)
 import Data.Data (Data, Typeable)
 import qualified Data.Foldable as Foldable
 import Data.Monoid ((<>))
@@ -63,10 +62,6 @@ import Data.Default (Default, def)
 import Data.Hashable (Hashable)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import Data.MonoTraversable (
-    Element, MonoFoldable, MonoFunctor, MonoPointed, MonoTraversable, otraverse,
-    omapM,
-    )
 import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Semigroup (Semigroup)
@@ -177,15 +172,11 @@ newtype Name = Name { _nameSegments :: Seq Segment }
         Read,
         Show,
         Generic,
-        MonoFunctor,
         Monoid,
-        MonoPointed,
         NFData,
         Semigroup,
         Typeable
         )
-
-type instance Element Name = Segment
 
 instance AsEmpty Name
 
@@ -201,12 +192,6 @@ instance IsList Name where
     type Item Name = Segment
     fromList = Name . Seq.fromList
     toList = Foldable.toList . _nameSegments
-
-deriving instance MonoFoldable Name
-
-instance MonoTraversable Name where
-    otraverse f = fmap Name . otraverse f . _nameSegments
-    omapM f = liftM Name . omapM f . _nameSegments
 
 instance Serial Name
 
@@ -236,15 +221,11 @@ newtype Segment = Segment { _segmentText :: Text }
         Generic,
         Hashable,
         IsString,
-        MonoFunctor,
         Monoid,
-        MonoPointed,
         NFData,
         Semigroup,
         Typeable
         )
-
-type instance Element Segment = Char
 
 instance AsEmpty Segment
 
@@ -268,12 +249,6 @@ instance FromJSON Segment where
     parseJSON = \case
         Json.String x -> return $ Segment x
         _ -> mzero
-
-deriving instance MonoFoldable Segment
-
-instance MonoTraversable Segment where
-    otraverse f = fmap Segment . otraverse f . _segmentText
-    omapM f = liftM Segment . omapM f . _segmentText
 
 instance Serial Segment
 
