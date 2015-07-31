@@ -79,7 +79,6 @@ options = Options
         <> Opt.long "lowercase"
         <> Opt.help "Do not capitalize output"
         )
-    -- TODO: this should be stdin by default.
     <*> Opt.strArgument
         ( Opt.metavar "FILE"
         <> Opt.help "The Nomicon file to use"
