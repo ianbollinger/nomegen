@@ -141,7 +141,7 @@ explainYamlParseException = (preamble <>) . \case
 
 generate :: Nomicon -> IO Name
 generate nomicon =
-    withSystemRandom . asGenST $ markovGenerate (_nomiconMarkovMap nomicon)
+    withSystemRandom . asGenST . markovGenerate $ _nomiconMarkovMap nomicon
 
 markovGenerate :: MarkovMap -> GenST s -> ST s Name
 markovGenerate (MarkovMap context markovMap) gen =
