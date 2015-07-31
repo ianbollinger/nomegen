@@ -48,10 +48,9 @@ import qualified Data.Foldable as Foldable
 import Data.Monoid ((<>))
 import Data.Ord (comparing)
 
-import Control.Lens.Cons ((|>))
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import Data.Sequence (Seq)
+import Data.Sequence (Seq, (|>))
 import qualified Data.Sequence as Seq
 import Data.Text (Text)
 import qualified Data.Yaml as Yaml
@@ -140,23 +139,19 @@ explainYamlParseException = (preamble <>) . \case
 
 -- Markov generator ------------------------------------------------------------
 
-generate :: Int -> Nomicon -> IO Name
-generate iterations nomicon =
-    withSystemRandom . asGenST $
-        markovGenerate iterations (_nomiconMarkovMap nomicon)
+generate :: Nomicon -> IO Name
+generate nomicon =
+    withSystemRandom . asGenST $ markovGenerate (_nomiconMarkovMap nomicon)
 
-markovGenerate :: Int -> MarkovMap -> GenST s -> ST s Name
-markovGenerate iterations (MarkovMap context markovMap) gen =
-    chooseKey markovMap gen >>= go iterations
+markovGenerate :: MarkovMap -> GenST s -> ST s Name
+markovGenerate (MarkovMap context markovMap) gen =
+    chooseKey markovMap gen >>= go
     where
-        go iterations' name
-            | iterations' <= 0 = return $ Name name
-            | otherwise =
-                case Map.lookup predecessor markovMap of
-                    Just key -> do
-                        successor <- genFromTable key gen
-                        go (iterations' - 1) (name |> successor)
-                    Nothing -> return $ Name name
+        go name = case Map.lookup predecessor markovMap of
+                Just key -> do
+                    successor <- genFromTable key gen
+                    go $ name |> successor
+                Nothing -> return $ Name name
             where
                 predecessor = Seq.drop (Seq.length name - context) name
 

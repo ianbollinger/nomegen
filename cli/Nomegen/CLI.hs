@@ -51,8 +51,7 @@ main = do
 printWords :: Options -> Nomicon -> IO ()
 printWords options' nomicon =
     replicateM_ (number options') $
-        -- TODO: don't hard code 7.
-        Text.putStrLn . format . nameToText =<< generate 7 nomicon
+        Text.putStrLn . format . nameToText =<< generate nomicon
   where
     format
         | lowerCase options' = id
