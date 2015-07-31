@@ -35,6 +35,7 @@ module Nomegen.Internal (
     Segment (..),
 
     -- * Markov generator
+    MarkovElement (..),
     MarkovMap (..),
     ) where
 
@@ -110,18 +111,25 @@ buildMarkovMap context =
 buildCondensedTableV :: Map a Double -> CondensedTableV a
 buildCondensedTableV = tableFromWeights . Vector.fromList . Map.toAscList
 
-type Weights = Map Segment Double
-type WeightMap = Map (Seq Segment) Weights
+data MarkovElement
+    = MarkovInitial
+    | MarkovMedial !Segment
+    deriving (Eq, Ord)
+
+type Weights = Map MarkovElement Double
+type WeightMap = Map (Seq MarkovElement) Weights
 
 countSegments :: Int -> Seq Name -> WeightMap
 countSegments context = Foldable.foldl' doNames mempty
     where
         doNames :: WeightMap -> Name -> WeightMap
-        doNames weights =
+        doNames weights name =
             Foldable.foldl' doSegments weights
             . windows (context + 1)
-            . _nameSegments
-        doSegments :: WeightMap -> Seq Segment -> WeightMap
+            -- TODO: this is a temporary hack. MarkovInitial should be repeated
+            -- `context` times.
+            $ MarkovInitial <| MarkovInitial <| fmap MarkovMedial (_nameSegments name)
+        doSegments :: WeightMap -> Seq MarkovElement -> WeightMap
         doSegments weightMap window =
             Map.alter f predecessor weightMap
             where
@@ -213,5 +221,6 @@ instance ToJSON Segment where
 
 -- Markov generator ------------------------------------------------------------
 
-data MarkovMap = MarkovMap !Int !(Map (Seq Segment) (CondensedTableV Segment))
+data MarkovMap =
+    MarkovMap !Int !(Map (Seq MarkovElement) (CondensedTableV MarkovElement))
 

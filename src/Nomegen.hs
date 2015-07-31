@@ -48,18 +48,17 @@ import qualified Data.Foldable as Foldable
 import Data.Monoid ((<>))
 import Data.Ord (comparing)
 
-import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import Data.Sequence (Seq, (|>))
 import qualified Data.Sequence as Seq
 import Data.Text (Text)
 import qualified Data.Yaml as Yaml
 import Data.Set (Set)
-import System.Random.MWC (GenST, asGenST, uniformR, withSystemRandom)
+import System.Random.MWC (GenST, asGenST, withSystemRandom)
 import System.Random.MWC.CondensedTable (genFromTable)
 
 import Nomegen.Internal (
-    MarkovMap (MarkovMap),
+    MarkovElement (MarkovInitial, MarkovMedial), MarkovMap (MarkovMap),
     Nomicon (_nomiconEntries, _nomiconMarkovMap, _nomiconSegments), Name (Name),
     Segment (Segment), nameToText,
     )
@@ -145,20 +144,15 @@ generate nomicon =
 
 markovGenerate :: MarkovMap -> GenST s -> ST s Name
 markovGenerate (MarkovMap context markovMap) gen =
-    chooseKey markovMap gen >>= go
+    -- TODO: temporary hack. Should be MarkovInitial * context
+    go (Seq.empty |> MarkovInitial |> MarkovInitial)
     where
         go name = case Map.lookup predecessor markovMap of
-                Just key -> do
-                    successor <- genFromTable key gen
-                    go $ name |> successor
-                Nothing -> return $ Name name
+            Just key -> do
+                successor <- genFromTable key gen
+                go $ name |> successor
+            Nothing ->
+                return . Name $ (\(MarkovMedial x) -> x) <$> Seq.drop 2 name
             where
                 predecessor = Seq.drop (Seq.length name - context) name
-
--- | Randomly choose a key from the given 'Map'.
-chooseKey :: Map k v -> GenST s -> ST s k
-chooseKey map' gen =
-    (keys !!) <$> uniformR (0, length keys - 1) gen
-    where
-        keys = Map.keys map'
 
