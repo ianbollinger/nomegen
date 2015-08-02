@@ -114,6 +114,7 @@ buildCondensedTableV = tableFromWeights . Vector.fromList . Map.toAscList
 data MarkovElement
     = MarkovInitial
     | MarkovMedial !Segment
+    | MarkovFinal
     deriving (Eq, Ord)
 
 type Weights = Map MarkovElement Double
@@ -127,7 +128,7 @@ countSegments context = Foldable.foldl' doNames mempty
             Foldable.foldl' doSegments weights
             . windows (context + 1)
             $ Seq.replicate context MarkovInitial <>
-                fmap MarkovMedial (_nameSegments name)
+                fmap MarkovMedial (_nameSegments name) |> MarkovFinal
         doSegments :: WeightMap -> Seq MarkovElement -> WeightMap
         doSegments weightMap window =
             Map.alter f predecessor weightMap

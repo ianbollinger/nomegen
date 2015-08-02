@@ -58,7 +58,8 @@ import System.Random.MWC (GenST, asGenST, withSystemRandom)
 import System.Random.MWC.CondensedTable (genFromTable)
 
 import Nomegen.Internal (
-    MarkovElement (MarkovInitial, MarkovMedial), MarkovMap (MarkovMap),
+    MarkovElement (MarkovFinal, MarkovInitial, MarkovMedial),
+    MarkovMap (MarkovMap),
     Nomicon (_nomiconEntries, _nomiconMarkovMap, _nomiconSegments), Name (Name),
     Segment (Segment), nameToText,
     )
@@ -151,7 +152,8 @@ markovGenerate (MarkovMap context markovMap) gen =
                 successor <- genFromTable key gen
                 go $ name |> successor
             Nothing ->
-                return . Name $ (\(MarkovMedial x) -> x) <$> Seq.drop 2 name
+                return . Name $ (\(MarkovMedial x) -> x) <$>
+                    Seq.dropWhileR (== MarkovFinal) (Seq.drop context name)
             where
                 predecessor = Seq.drop (Seq.length name - context) name
 
