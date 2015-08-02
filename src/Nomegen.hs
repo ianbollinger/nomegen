@@ -144,8 +144,7 @@ generate nomicon =
 
 markovGenerate :: MarkovMap -> GenST s -> ST s Name
 markovGenerate (MarkovMap context markovMap) gen =
-    -- TODO: temporary hack. Should be MarkovInitial * context
-    go (Seq.empty |> MarkovInitial |> MarkovInitial)
+    go $ Seq.replicate context MarkovInitial
     where
         go name = case Map.lookup predecessor markovMap of
             Just key -> do

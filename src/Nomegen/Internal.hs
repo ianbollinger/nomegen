@@ -126,9 +126,8 @@ countSegments context = Foldable.foldl' doNames mempty
         doNames weights name =
             Foldable.foldl' doSegments weights
             . windows (context + 1)
-            -- TODO: this is a temporary hack. MarkovInitial should be repeated
-            -- `context` times.
-            $ MarkovInitial <| MarkovInitial <| fmap MarkovMedial (_nameSegments name)
+            $ Seq.replicate context MarkovInitial <>
+                fmap MarkovMedial (_nameSegments name)
         doSegments :: WeightMap -> Seq MarkovElement -> WeightMap
         doSegments weightMap window =
             Map.alter f predecessor weightMap
