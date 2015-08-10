@@ -45,6 +45,7 @@ module Nomegen (
 
 import Control.Monad.ST (ST)
 import qualified Data.Foldable as Foldable
+import Data.Functor ((<$>))
 import Data.Monoid ((<>))
 import Data.Ord (comparing)
 

@@ -42,7 +42,7 @@ module Nomegen.Internal (
 import Control.Monad (mzero)
 import Data.Data (Data, Typeable)
 import qualified Data.Foldable as Foldable
-import Data.Monoid ((<>))
+import Data.Monoid (Monoid, (<>))
 import Data.String (IsString)
 import GHC.Generics (Generic)
 import GHC.Exts (IsList, Item, fromList, toList)
@@ -121,7 +121,7 @@ type Weights = Map MarkovElement Double
 type WeightMap = Map (Seq MarkovElement) Weights
 
 countSegments :: Int -> Seq Name -> WeightMap
-countSegments context = Foldable.foldl' doNames mempty
+countSegments context = Foldable.foldl' doNames Map.empty
     where
         doNames :: WeightMap -> Name -> WeightMap
         doNames weights name =
@@ -142,10 +142,10 @@ countSegments context = Foldable.foldl' doNames mempty
 -- | Sliding windows over a sequence. That is, @windows n xs@ is every
 -- length-/n/ subsequence of /xs/ in order.
 windows :: Int -> Seq a -> Seq (Seq a)
-windows n0 = go 0 mempty
+windows n0 = go 0 Seq.empty
     where
         go n s ax = case viewl ax of
-            EmptyL -> mempty
+            EmptyL -> Seq.empty
             a :< as
                 | n' < n0 -> go n' s' as
                 | n' == n0 -> s' <| go n' s' as

@@ -12,6 +12,7 @@ module Nomegen.CLI (
     main,
     ) where
 
+import Control.Applicative ((<$>), (<*>))
 import Control.Monad (replicateM_)
 import Data.Char (toUpper)
 import Data.Monoid ((<>))
