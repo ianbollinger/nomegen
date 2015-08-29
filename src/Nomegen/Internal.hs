@@ -57,7 +57,6 @@ import Data.Sequence (
     Seq, ViewL ((:<), EmptyL), ViewR ((:>)), (<|), (|>), viewl, viewr,
     )
 import qualified Data.Sequence as Seq
-import Data.Semigroup (Semigroup)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import Data.Set (Set)
@@ -173,7 +172,6 @@ newtype Name = Name { _nameSegments :: Seq Segment }
         Generic,
         Monoid,
         NFData,
-        Semigroup,
         Typeable
         )
 
@@ -202,7 +200,6 @@ newtype Segment = Segment { _segmentText :: Text }
         IsString,
         Monoid,
         NFData,
-        Semigroup,
         Typeable
         )
 
