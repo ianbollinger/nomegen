@@ -157,4 +157,3 @@ markovGenerate (MarkovMap context markovMap) gen =
                     Seq.dropWhileR (== MarkovFinal) (Seq.drop context name)
             where
                 predecessor = Seq.drop (Seq.length name - context) name
-

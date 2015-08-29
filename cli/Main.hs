@@ -13,4 +13,3 @@ import qualified Nomegen.CLI as CLI
 
 main :: IO ()
 main = CLI.main
-

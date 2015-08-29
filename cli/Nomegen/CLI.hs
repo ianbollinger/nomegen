@@ -87,4 +87,3 @@ options = Options
 
 capitalize :: Text -> Text
 capitalize = Text.cons . toUpper . Text.head <*> Text.tail
-

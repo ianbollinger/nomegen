@@ -72,4 +72,3 @@ executable nomegen
         -fwarn-monomorphism-restriction
         -fwarn-tabs
         -fwarn-unrecognised-pragmas
-

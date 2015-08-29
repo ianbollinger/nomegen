@@ -15,4 +15,3 @@ Generates `N` random names using the provided Nomicon `FILE`.
 - `-n`, `--number N`: The number of names to generate (default: 1).
 - `-l`, `--lowercase`: Do not capitalize names.
 - `FILE`: The Nomicon file to use.
-

@@ -223,4 +223,3 @@ instance ToJSON Segment where
 
 data MarkovMap =
     MarkovMap !Int !(Map (Seq MarkovElement) (CondensedTableV MarkovElement))
-
