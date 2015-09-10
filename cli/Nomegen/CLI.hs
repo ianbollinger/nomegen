@@ -5,14 +5,17 @@
 -- or http://opensource.org/licenses/MIT>, at your option. This file may not be
 -- copied, modified, or distributed except according to those terms.
 
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Nomegen.CLI (
     main,
     ) where
 
+#if __GLASGOW_HASKELL__ < 710
 import Control.Applicative ((<$>), (<*>))
+#endif
 import Control.Monad (replicateM_)
 import Data.Char (toUpper)
 import Data.Monoid ((<>))
