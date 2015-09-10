@@ -5,6 +5,7 @@
 -- or http://opensource.org/licenses/MIT>, at your option. This file may not be
 -- copied, modified, or distributed except according to those terms.
 
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE LambdaCase #-}
 
 -- |
@@ -45,7 +46,9 @@ module Nomegen (
 
 import Control.Monad.ST (ST)
 import qualified Data.Foldable as Foldable
+#if __GLASGOW_HASKELL__ < 710
 import Data.Functor ((<$>))
+#endif
 import Data.Monoid ((<>))
 import Data.Ord (comparing)
 

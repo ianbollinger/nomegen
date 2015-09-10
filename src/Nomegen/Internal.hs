@@ -5,6 +5,7 @@
 -- or http://opensource.org/licenses/MIT>, at your option. This file may not be
 -- copied, modified, or distributed except according to those terms.
 
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
@@ -42,7 +43,12 @@ module Nomegen.Internal (
 import Control.Monad (mzero)
 import Data.Data (Data, Typeable)
 import qualified Data.Foldable as Foldable
-import Data.Monoid (Monoid, (<>))
+import Data.Monoid (
+#if __GLASGOW_HASKELL__ < 710
+    Monoid,
+#endif
+    (<>),
+    )
 import Data.String (IsString)
 import GHC.Generics (Generic)
 import GHC.Exts (IsList, Item, fromList, toList)

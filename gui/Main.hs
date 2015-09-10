@@ -5,11 +5,15 @@
 -- or http://opensource.org/licenses/MIT>, at your option. This file may not be
 -- copied, modified, or distributed except according to those terms.
 
+{-# LANGUAGE CPP #-}
+
 module Main (
     main,
     ) where
 
+#if __GLASGOW_HASKELL__ < 710
 import Control.Applicative ((<$>), (<*>))
+#endif
 import Data.Char (toUpper)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.Maybe (fromMaybe)
