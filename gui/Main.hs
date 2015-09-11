@@ -38,7 +38,7 @@ main :: IO ()
 main = do
     _ <- Gtk.initGUI
     app <- Application
-        <$> Gtk.labelNew (Just "nomegen")
+        <$> Gtk.labelNew (Just "")
         <*> buildFileChooserButton
         <*> buildGenerateButton
         <*> newIORef Nothing
@@ -88,7 +88,10 @@ onGenerateButtonActivated label lexicon = do
     case lexicon' of
         Just lexicon'' -> do
             name <- getName lexicon''
-            Gtk.set label [Gtk.labelLabel := name]
+            Gtk.set label [
+                Gtk.labelLabel := name,
+                Gtk.labelSelectable := True
+                ]
         Nothing -> error "impossible"
 
 buildGenerateButton :: IO Gtk.Button
