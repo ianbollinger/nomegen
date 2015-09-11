@@ -17,6 +17,7 @@ import Control.Applicative ((<$>), (<*>))
 import Data.Char (toUpper)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.Maybe (fromMaybe)
+import Data.Monoid ((<>))
 
 import Data.Text (Text)
 import qualified Data.Text as Text
@@ -38,7 +39,7 @@ main :: IO ()
 main = do
     _ <- Gtk.initGUI
     app <- Application
-        <$> Gtk.labelNew (Just "nomegen")
+        <$> buildNameLabel
         <*> buildFileChooserButton
         <*> buildGenerateButton
         <*> newIORef Nothing
@@ -88,8 +89,18 @@ onGenerateButtonActivated label lexicon = do
     case lexicon' of
         Just lexicon'' -> do
             name <- getName lexicon''
-            Gtk.set label [Gtk.labelLabel := name]
+            Gtk.set label [
+                Gtk.labelLabel := Text.pack "<span size=\"xx-large\">"
+                    <> name <> Text.pack "</span>",
+                Gtk.labelSelectable := True
+                ]
         Nothing -> error "impossible"
+
+buildNameLabel :: IO Gtk.Label
+buildNameLabel = do
+    label <- Gtk.labelNew (Just "<span size=\"xx-large\"> </span>")
+    Gtk.set label [Gtk.labelUseMarkup := True]
+    return label
 
 buildGenerateButton :: IO Gtk.Button
 buildGenerateButton = do
