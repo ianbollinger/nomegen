@@ -90,7 +90,8 @@ onGenerateButtonActivated label lexicon = do
         Just lexicon'' -> do
             name <- getName lexicon''
             Gtk.set label [
-                Gtk.labelLabel := Text.pack "<span size=\"xx-large\">" <> name <> Text.pack "</span>",
+                Gtk.labelLabel := Text.pack "<span size=\"xx-large\">"
+                    <> name <> Text.pack "</span>",
                 Gtk.labelSelectable := True
                 ]
         Nothing -> error "impossible"
@@ -98,9 +99,7 @@ onGenerateButtonActivated label lexicon = do
 buildNameLabel :: IO Gtk.Label
 buildNameLabel = do
     label <- Gtk.labelNew (Just "<span size=\"xx-large\"> </span>")
-    Gtk.set label [
-        Gtk.labelUseMarkup := True
-        ]
+    Gtk.set label [Gtk.labelUseMarkup := True]
     return label
 
 buildGenerateButton :: IO Gtk.Button
